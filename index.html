@@ -37,71 +37,64 @@
 
     <a-scene mindar-image="imageTargetSrc: ./assets/targets.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-assets>
-            <a-assets>
-				<video id="main-video" src="./assets/video.mp4" crossorigin="anonymous" playsinline></video>
-				<audio id="humming-bg" src="./assets/background.mp3" loop="true" crossorigin="anonymous"></audio>
-				<img id="play-icon" src="./assets/play-btn.png">
-				<img id="pause-icon" src="./assets/play-btn.png">
-			</a-assets>
+            <video id="main-video" src="./assets/video.mp4" crossorigin="anonymous" playsinline></video>
+            <audio id="humming-bg" src="./assets/background.mp3" loop="true" crossorigin="anonymous"></audio>
+            <img id="play-icon" src="./assets/play-btn.png">
+            <img id="pause-icon" src="./assets/pause-btn.png">
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .clickable"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0">
-			<a-video id="video-entity" src="#main-video" width="1" height="0.6" position="0 0 0.01"
-             sound="src: #main-video; autoplay: false; volume: 1;バランス positional: false">
-			</a-video>
+            <a-video id="video-entity" src="#main-video" width="1" height="0.6" position="0 0 0.01"
+                     sound="src: #main-video; autoplay: false; volume: 1; positional: false">
+            </a-video>
 
-			<a-image id="control-button" class="clickable" src="#play-icon" 
-             position="0 0 0.05" width="0.2" height="0.2"
-             onclick="toggleVideo()">
-			</a-image>
-		</a-entity>
+            <a-image id="control-button" class="clickable" src="#play-icon" 
+                     position="0 0 0.05" width="0.2" height="0.2"
+                     onclick="toggleVideo()">
+            </a-image>
+        </a-entity>
     </a-scene>
 
     <script>
         const startScreen = document.getElementById('start-screen');
-        const videoFile = document.getElementById('poster-video');
-        const bgMusic = document.getElementById('bg-music');
-        const playBtnVisual = document.getElementById('video-play-btn');
+        const videoFile = document.getElementById('main-video');
+        const bgMusic = document.getElementById('humming-bg');
 
         function startExperience() {
             startScreen.style.display = 'none';
             // Start the background music immediately upon entering
+            bgMusic.play().catch(e => console.log("Audio play failed:", e));
+        }
+
+        function toggleVideo() {
+            const btn = document.getElementById('control-button');
+            const ent = document.getElementById('video-entity');
+
+            if (videoFile.paused) {
+                // PLAY LOGIC
+                bgMusic.pause();
+                videoFile.play();
+                if (ent.components.sound) ent.components.sound.playSound();
+                btn.setAttribute('src', '#pause-icon');
+                btn.setAttribute('visible', 'false'); // Hide while playing
+            } else {
+                // PAUSE LOGIC
+                videoFile.pause();
+                bgMusic.play();
+                btn.setAttribute('src', '#play-icon');
+                btn.setAttribute('visible', 'true');
+            }
+        }
+
+        // Return to background music when video ends
+        videoFile.onended = () => {
+            const btn = document.getElementById('control-button');
+            btn.setAttribute('src', '#play-icon');
+            btn.setAttribute('visible', 'true');
             bgMusic.play();
-        }
-
-		function toggleVideo() {
-			const vid = document.getElementById('main-video');
-			const bgMusic = document.getElementById('humming-bg');
-			const btn = document.getElementById('control-button');
-			const ent = document.getElementById('video-entity');
-
-		if (vid.paused) {
-        // PLAY LOGIC
-        bgMusic.pause();
-        vid.play();
-			if (ent.components.sound) ent.components.sound.playSound();
-        btn.setAttribute('src', '#pause-icon'); // Switch icon to Pause
-        btn.setAttribute('visible', 'false');  // Optional: Hide while playing, or keep visible to allow pausing
-		} else {
-        // PAUSE LOGIC
-        vid.pause();
-        bgMusic.play();
-        btn.setAttribute('src', '#play-icon'); // Switch icon to Play
-        btn.setAttribute('visible', 'true');
-    }
-}
-
-// Make sure the button reappears if the video ends naturally
-document.getElementById('main-video').onended = () => {
-    const btn = document.getElementById('control-button');
-    const bgMusic = document.getElementById('humming-bg');
-    btn.setAttribute('src', '#play-icon');
-    btn.setAttribute('visible', 'true');
-    bgMusic.play();
-};
-        }
+        };
 
         function openPage(title, content, imgSrc) {
             document.getElementById('info-overlay').style.display = 'block';
@@ -109,14 +102,12 @@ document.getElementById('main-video').onended = () => {
             document.getElementById('page-content').innerText = content;
             document.getElementById('page-img').src = imgSrc;
             
-            // Pause everything when reading
             videoFile.pause();
             bgMusic.pause();
         }
 
         function closePage() {
             document.getElementById('info-overlay').style.display = 'none';
-            // If the video was already playing, resume it; otherwise, resume BG music
             if (!videoFile.paused) {
                 videoFile.play();
             } else {
