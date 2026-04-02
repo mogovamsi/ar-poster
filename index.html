@@ -14,6 +14,11 @@
     </style>
 </head>
 <body>
+	<div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center;">
+    <h2>Poster AR Experience</h2>
+    <p>Tap the button below to start the camera and video.</p>
+    <button onclick="startExperience()" style="padding: 15px 30px; font-size: 18px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 5px;">START AR</button>
+</div>
     <div id="info-overlay">
         <button class="back-btn" onclick="closePage()">← Back to AR</button>
         <h1 id="page-title"></h1>
