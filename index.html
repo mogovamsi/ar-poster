@@ -55,7 +55,8 @@
 	if (arVideoEntity.components.sound) {
         arVideoEntity.components.sound.playSound();
     // If your video has sound, browsers might still block it. 
-    // This line ensures it plays regardless. 
+    // This line ensures it plays regardless.
+    video.muted = false; 
 }
         const overlay = document.getElementById('info-overlay');
         const video = document.getElementById('poster-video');
