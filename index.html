@@ -28,7 +28,7 @@
 
     <a-scene mindar-image="imageTargetSrc: ./assets/targets.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-assets>
-            <video id="poster-video" src="./assets/video.mp4" loop="true" crossorigin="anonymous" playsinline muted></video>
+            <video id="poster-video" src="./assets/video.mp4" loop="true" crossorigin="anonymous" playsinline></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .clickable"></a-camera>
@@ -49,11 +49,13 @@
     
     // Explicitly tell the video to play
     const video = document.getElementById('poster-video');
+	const arVideoEntity = document.querySelector('a-video');
     video.play();
     
+	if (arVideoEntity.components.sound) {
+        arVideoEntity.components.sound.playSound();
     // If your video has sound, browsers might still block it. 
-    // This line ensures it plays regardless.
-    video.muted = true; 
+    // This line ensures it plays regardless. 
 }
         const overlay = document.getElementById('info-overlay');
         const video = document.getElementById('poster-video');
