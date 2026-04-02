@@ -4,20 +4,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-    <style>
-        #start-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 1000; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            color: white; font-family: sans-serif;
-        }
+	<style>
         #info-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: white; z-index: 999; padding: 20px; box-sizing: border-box;
             font-family: sans-serif; overflow-y: auto;
         }
-        .btn { padding: 15px 30px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        .back-btn { padding: 10px 20px; background: #333; color: white; border: none; border-radius: 5px; }
     </style>
+</style>
 </head>
 <body>
 
