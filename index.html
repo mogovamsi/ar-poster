@@ -5,14 +5,12 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-        /* Start Screen */
         #start-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.9); z-index: 1000; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             color: white; font-family: sans-serif;
         }
-        /* Info Overlay */
         #info-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: white; z-index: 999; padding: 20px; box-sizing: border-box;
@@ -26,8 +24,8 @@
 
     <div id="start-screen">
         <h2>Poster AR Experience</h2>
-        <p>Ready to begin?</p>
-        <button class="btn" onclick="startExperience()">START AR</button>
+        <p>Tap to enter and hear background music.</p>
+        <button class="btn" onclick="startExperience()">ENTER EXPERIENCE</button>
     </div>
 
     <div id="info-overlay">
@@ -39,52 +37,80 @@
 
     <a-scene mindar-image="imageTargetSrc: ./assets/targets.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-assets>
-            <video id="poster-video" src="./assets/video.mp4" loop="true" crossorigin="anonymous" playsinline></video>
+            <video id="poster-video" src="./assets/video.mp4" crossorigin="anonymous" playsinline></video>
+            <audio id="bg-music" src="./assets/background.mp3" loop="true" crossorigin="anonymous"></audio>
+            <img id="play-icon" src="https://cdn-icons-png.flaticon.com/512/0/375.png">
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .clickable"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0">
             <a-video id="ar-video-entity" src="#poster-video" width="1" height="0.6" position="0 0 0.01"
-                     sound="src: #poster-video; autoplay: false; loop: true; volume: 1; positional: false">
+                     sound="src: #poster-video; autoplay: false; loop: false; volume: 1; positional: false">
             </a-video>
 
+            <a-image id="video-play-btn" class="clickable" src="#play-icon" position="0 0 0.05" width="0.2" height="0.2"
+                     onclick="playMainVideo()">
+            </a-image>
+
             <a-plane class="clickable" position="-0.3 -0.4 0.02" width="0.3" height="0.1" material="opacity: 0; transparent: true"
-                     onclick="openPage('Highlighted Word', 'Description text here...', './assets/img-a.jpg')">
+                     onclick="openPage('Highlighted Word', 'Description...', './assets/img-a.jpg')">
             </a-plane>
         </a-entity>
     </a-scene>
 
     <script>
         const startScreen = document.getElementById('start-screen');
-        const infoOverlay = document.getElementById('info-overlay');
         const videoFile = document.getElementById('poster-video');
+        const bgMusic = document.getElementById('bg-music');
+        const playBtnVisual = document.getElementById('video-play-btn');
 
         function startExperience() {
-            console.log("Start button clicked!"); // Check this in phone's inspect tool if possible
             startScreen.style.display = 'none';
+            // Start the background music immediately upon entering
+            bgMusic.play();
+        }
+
+        function playMainVideo() {
+            // 1. Mute the background music
+            bgMusic.pause();
             
-            // Start the actual video file
-            videoFile.play().catch(err => console.log("Video play failed:", err));
-            
-            // Start the A-Frame sound component
+            // 2. Play the main video and its sound
+            videoFile.play();
             const entity = document.getElementById('ar-video-entity');
             if (entity.components.sound) {
                 entity.components.sound.playSound();
             }
+
+            // 3. Hide the play button visual
+            playBtnVisual.setAttribute('visible', false);
+
+            // 4. When video ends, bring back background music and play button
+            videoFile.onended = function() {
+                bgMusic.play();
+                playBtnVisual.setAttribute('visible', true);
+            };
         }
 
         function openPage(title, content, imgSrc) {
+            document.getElementById('info-overlay').style.display = 'block';
             document.getElementById('page-title').innerText = title;
             document.getElementById('page-content').innerText = content;
             document.getElementById('page-img').src = imgSrc;
-            infoOverlay.style.display = 'block';
+            
+            // Pause everything when reading
             videoFile.pause();
+            bgMusic.pause();
         }
 
         function closePage() {
-            infoOverlay.style.display = 'none';
-            videoFile.play();
+            document.getElementById('info-overlay').style.display = 'none';
+            // If the video was already playing, resume it; otherwise, resume BG music
+            if (!videoFile.paused) {
+                videoFile.play();
+            } else {
+                bgMusic.play();
+            }
         }
     </script>
 </body>
