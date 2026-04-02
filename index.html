@@ -37,26 +37,26 @@
 
     <a-scene mindar-image="imageTargetSrc: ./assets/targets.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-assets>
-            <video id="poster-video" src="./assets/video.mp4" crossorigin="anonymous" playsinline></video>
-            <audio id="bg-music" src="./assets/background.mp3" loop="true" crossorigin="anonymous"></audio>
-            <img id="play-icon" src="./assets/play-btn.png">
+            <a-assets>
+				<video id="main-video" src="./assets/video.mp4" crossorigin="anonymous" playsinline></video>
+				<audio id="humming-bg" src="./assets/background.mp3" loop="true" crossorigin="anonymous"></audio>
+				<img id="play-icon" src="./assets/play-btn.png">
+				<img id="pause-icon" src="./assets/play-btn.png">
+			</a-assets>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: 10000; objects: .clickable"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0">
-            <a-video id="ar-video-entity" src="#poster-video" width="1" height="0.6" position="0 0 0.1"
-                     sound="src: #poster-video; autoplay: false; loop: false; volume: 1; positional: false">
-            </a-video>
+			<a-video id="video-entity" src="#main-video" width="1" height="0.6" position="0 0 0.01"
+             sound="src: #main-video; autoplay: false; volume: 1;バランス positional: false">
+			</a-video>
 
-            <a-image id="video-play-btn" class="clickable" src="#play-icon" position="0 0 0.05" width="0.2" height="0.2"
-                     onclick="playMainVideo()">
-            </a-image>
-
-            <a-plane class="clickable" position="-0.3 -0.4 0.02" width="0.3" height="0.1" material="opacity: 0; transparent: true"
-                     onclick="openPage('Highlighted Word', 'Description...', './assets/img-a.jpg')">
-            </a-plane>
-        </a-entity>
+			<a-image id="control-button" class="clickable" src="#play-icon" 
+             position="0 0 0.05" width="0.2" height="0.2"
+             onclick="toggleVideo()">
+			</a-image>
+		</a-entity>
     </a-scene>
 
     <script>
@@ -71,25 +71,36 @@
             bgMusic.play();
         }
 
-        function playMainVideo() {
-            // 1. Mute the background music
-            bgMusic.pause();
-            
-            // 2. Play the main video and its sound
-            videoFile.play();
-            const entity = document.getElementById('ar-video-entity');
-            if (entity.components.sound) {
-                entity.components.sound.playSound();
-            }
+		function toggleVideo() {
+			const vid = document.getElementById('main-video');
+			const bgMusic = document.getElementById('humming-bg');
+			const btn = document.getElementById('control-button');
+			const ent = document.getElementById('video-entity');
 
-            // 3. Hide the play button visual
-            playBtnVisual.setAttribute('visible', false);
+		if (vid.paused) {
+        // PLAY LOGIC
+        bgMusic.pause();
+        vid.play();
+			if (ent.components.sound) ent.components.sound.playSound();
+        btn.setAttribute('src', '#pause-icon'); // Switch icon to Pause
+        btn.setAttribute('visible', 'false');  // Optional: Hide while playing, or keep visible to allow pausing
+		} else {
+        // PAUSE LOGIC
+        vid.pause();
+        bgMusic.play();
+        btn.setAttribute('src', '#play-icon'); // Switch icon to Play
+        btn.setAttribute('visible', 'true');
+    }
+}
 
-            // 4. When video ends, bring back background music and play button
-            videoFile.onended = function() {
-                bgMusic.play();
-                playBtnVisual.setAttribute('visible', true);
-            };
+// Make sure the button reappears if the video ends naturally
+document.getElementById('main-video').onended = () => {
+    const btn = document.getElementById('control-button');
+    const bgMusic = document.getElementById('humming-bg');
+    btn.setAttribute('src', '#play-icon');
+    btn.setAttribute('visible', 'true');
+    bgMusic.play();
+};
         }
 
         function openPage(title, content, imgSrc) {
