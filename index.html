@@ -17,7 +17,6 @@
             font-family: sans-serif; overflow-y: auto;
         }
         .btn { padding: 15px 30px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
-        .back-btn { background: #333; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -29,7 +28,7 @@
     </div>
 
     <div id="info-overlay">
-        <button class="btn back-btn" onclick="closePage()">← Back to AR</button>
+        <button class="btn" style="background:#333" onclick="closePage()">← Back</button>
         <h1 id="page-title"></h1>
         <p id="page-content"></p>
         <img id="page-img" src="" style="width:100%; border-radius: 10px;">
@@ -63,9 +62,9 @@
         const bgMusic = document.getElementById('humming-bg');
 
         function startExperience() {
+            console.log("Button clicked!");
             startScreen.style.display = 'none';
-            // Start the background music immediately upon entering
-            bgMusic.play().catch(e => console.log("Audio play failed:", e));
+            bgMusic.play().catch(e => console.log("Audio failed:", e));
         }
 
         function toggleVideo() {
@@ -73,14 +72,12 @@
             const ent = document.getElementById('video-entity');
 
             if (videoFile.paused) {
-                // PLAY LOGIC
                 bgMusic.pause();
                 videoFile.play();
                 if (ent.components.sound) ent.components.sound.playSound();
                 btn.setAttribute('src', '#pause-icon');
-                btn.setAttribute('visible', 'false'); // Hide while playing
+                btn.setAttribute('visible', 'false');
             } else {
-                // PAUSE LOGIC
                 videoFile.pause();
                 bgMusic.play();
                 btn.setAttribute('src', '#play-icon');
@@ -88,31 +85,16 @@
             }
         }
 
-        // Return to background music when video ends
         videoFile.onended = () => {
-            const btn = document.getElementById('control-button');
-            btn.setAttribute('src', '#play-icon');
-            btn.setAttribute('visible', 'true');
+            document.getElementById('control-button').setAttribute('src', '#play-icon');
+            document.getElementById('control-button').setAttribute('visible', 'true');
             bgMusic.play();
         };
 
-        function openPage(title, content, imgSrc) {
-            document.getElementById('info-overlay').style.display = 'block';
-            document.getElementById('page-title').innerText = title;
-            document.getElementById('page-content').innerText = content;
-            document.getElementById('page-img').src = imgSrc;
-            
-            videoFile.pause();
-            bgMusic.pause();
-        }
-
         function closePage() {
             document.getElementById('info-overlay').style.display = 'none';
-            if (!videoFile.paused) {
-                videoFile.play();
-            } else {
-                bgMusic.play();
-            }
+            if (!videoFile.paused) videoFile.play();
+            else bgMusic.play();
         }
     </script>
 </body>
